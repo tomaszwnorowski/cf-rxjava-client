@@ -3,6 +3,7 @@ package client;
 import feign.Feign;
 import feign.Feign.Builder;
 import feign.Logger;
+import feign.RequestInterceptor;
 import feign.Response;
 import feign.codec.Decoder;
 import feign.jackson.JacksonEncoder;
@@ -15,6 +16,7 @@ import queries.Query;
 import rx.Observable;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -23,30 +25,35 @@ public class CfRxClient implements Organizations, Spaces, Services {
     private final Spaces spaces;
     private final Services services;
 
+    public CfRxClient(OAuth2ClientConfig config) {
+        this(config.getTarget(), new OAuth2RequestInterceptor(config.getAccessToken()));
+    }
+
     public CfRxClient(String api) {
         this(api, Function.identity());
     }
 
+    public CfRxClient(String api, RequestInterceptor... interceptors) {
+        this(api, builder -> builder.requestInterceptors(Arrays.asList(interceptors)));
+    }
+
     public CfRxClient(String api, Function<Builder, Builder> customizations) {
-        organizations = defaults().andThen(customizations)
-                .apply(new CfRxDecoder<>(this::getOrganizations))
+        organizations = customizations.apply(defaults(new CfRxDecoder<>(this::getOrganizations)))
                 .target(Organizations.class, api);
 
-        spaces = defaults().andThen(customizations)
-                .apply(new CfRxDecoder<>(this::getSpaces))
+        spaces = customizations.apply(defaults(new CfRxDecoder<>(this::getSpaces)))
                 .target(Spaces.class, api);
 
-        services = defaults().andThen(customizations)
-                .apply(new CfRxDecoder<>(this::getServices))
+        services = customizations.apply(defaults(new CfRxDecoder<>(this::getServices)))
                 .target(Services.class, api);
     }
 
-    private Function<Decoder, Builder> defaults() {
-        return decoder -> Feign.builder()
+    private Builder defaults(Decoder decoder) {
+        return Feign.builder()
                 .encoder(new JacksonEncoder())
                 .decoder(decoder)
                 .logger(new Slf4jLogger())
-                .logLevel(Logger.Level.FULL);
+                .logLevel(Logger.Level.HEADERS);
     }
 
     /*****************
