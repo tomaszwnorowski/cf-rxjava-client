@@ -52,8 +52,8 @@ public class CfRxClient implements Organizations, Spaces, Services {
         return Feign.builder()
                 .encoder(new JacksonEncoder())
                 .decoder(decoder)
-                .logger(new Slf4jLogger())
-                .logLevel(Logger.Level.HEADERS);
+                .logger(new CfSlf4jLogger())
+                .logLevel(Logger.Level.FULL);
     }
 
     /*****************
