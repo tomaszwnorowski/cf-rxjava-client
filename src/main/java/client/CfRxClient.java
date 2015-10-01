@@ -25,7 +25,7 @@ public class CfRxClient implements Organizations, Spaces, Services {
     private final Spaces spaces;
     private final Services services;
 
-    public CfRxClient(OAuth2ClientConfig config) {
+    public CfRxClient(CfConfig config) {
         this(config.getTarget(), new OAuth2RequestInterceptor(config.getAccessToken()));
     }
 

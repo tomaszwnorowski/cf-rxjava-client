@@ -18,6 +18,6 @@ public class OAuth2RequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header("Authorization", "Bearer " + supplier.get());
+        template.header("Authorization", "bearer " + supplier.get());
     }
 }
