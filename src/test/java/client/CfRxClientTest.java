@@ -10,6 +10,7 @@ import feign.Response;
 import models.Organization;
 import models.Page;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import queries.Operator;
@@ -24,8 +25,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class CfRxClientTest {
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    @ClassRule
+    public static WireMockRule wireMockRule = new WireMockRule();
 
     public CfRxClient client;
 

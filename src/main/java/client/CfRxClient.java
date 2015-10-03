@@ -1,10 +1,7 @@
 package client;
 
-import feign.Feign;
+import feign.*;
 import feign.Feign.Builder;
-import feign.Logger;
-import feign.RequestInterceptor;
-import feign.Response;
 import feign.codec.Decoder;
 import feign.jackson.JacksonEncoder;
 import models.*;
@@ -62,7 +59,7 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
                 .encoder(new JacksonEncoder())
                 .decoder(decoder)
                 .logger(new CfSlf4jLogger())
-                .logLevel(Logger.Level.BASIC);
+                .logLevel(Logger.Level.FULL);
     }
 
     /************************************************************************************************
@@ -431,6 +428,26 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return services.getServices(guid);
     }
 
+    @Override
+    public Observable<Service> getServices(Query query) {
+        return services.getServices(query);
+    }
+
+    @Override
+    public Observable<Response> deleteService(UUID service) {
+        return services.deleteService(service);
+    }
+
+    @Override
+    public Observable<ServicePlan> getServicePlans(UUID service) {
+        return services.getServicePlans(service);
+    }
+
+    @Override
+    public Observable<ServicePlan> getServicePlans(UUID service, Query query) {
+        return services.getServicePlans(service, query);
+    }
+
     /************************************************************************************************
      * SERVICE INSTANCES
      ************************************************************************************************/
@@ -438,6 +455,51 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     @Override
     public Observable<ServiceInstance> getServiceInstances(URI uri) {
         return serviceInstances.getServiceInstances(uri);
+    }
+
+    @Override
+    public Observable<ServiceInstance> getServiceInstances() {
+        return serviceInstances.getServiceInstances();
+    }
+
+    @Override
+    public Observable<ServiceInstance> getServiceInstances(Query query) {
+        return serviceInstances.getServiceInstances(query);
+    }
+
+    @Override
+    public Observable<ServiceInstance> createServiceInstance(String name, UUID servicePlan, UUID space) {
+        return serviceInstances.createServiceInstance(name, servicePlan, space);
+    }
+
+    @Override
+    public Observable<ServiceInstance> createServiceInstance(String name, UUID servicePlan, UUID space, Object parameters) {
+        return serviceInstances.createServiceInstance(name, servicePlan, space, parameters);
+    }
+
+    @Override
+    public Observable<ServiceInstance> updateServiceInstance(UUID serviceInstance, String name, UUID servicePlan) {
+        return serviceInstances.updateServiceInstance(serviceInstance, name, servicePlan);
+    }
+
+    @Override
+    public Observable<ServiceInstance> updateServiceInstance(UUID serviceInstance, String name, UUID servicePlan, Object parameters) {
+        return serviceInstances.updateServiceInstance(serviceInstance, name, servicePlan, parameters);
+    }
+
+    @Override
+    public Observable<ServiceInstance> deleteServiceInstance(UUID serviceInstance) {
+        return serviceInstances.deleteServiceInstance(serviceInstance);
+    }
+
+    @Override
+    public Observable<Route> getServiceInstanceRoutes(UUID serviceInstance) {
+        return serviceInstances.getServiceInstanceRoutes(serviceInstance);
+    }
+
+    @Override
+    public Observable<ServiceBinding> getServiceInstanceBindings(UUID serviceInstance) {
+        return serviceInstances.getServiceInstanceBindings(serviceInstance);
     }
 
     /************************************************************************************************
