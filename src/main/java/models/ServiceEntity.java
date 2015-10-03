@@ -10,6 +10,7 @@ public class ServiceEntity {
 
     protected String label;
     protected String description;
+    protected String longDescription;
     protected boolean active;
     protected boolean bindable;
     protected Object extra;

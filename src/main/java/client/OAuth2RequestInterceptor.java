@@ -3,6 +3,7 @@ package client;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class OAuth2RequestInterceptor implements RequestInterceptor {
@@ -13,7 +14,7 @@ public class OAuth2RequestInterceptor implements RequestInterceptor {
     }
 
     public OAuth2RequestInterceptor(Supplier<String> supplier) {
-        this.supplier = supplier;
+        this.supplier = Objects.requireNonNull(supplier);
     }
 
     @Override

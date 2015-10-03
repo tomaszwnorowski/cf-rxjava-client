@@ -15,9 +15,9 @@ public interface Services {
     @RequestLine("GET")
     Observable<Service> getServices(URI uri);
 
-    @RequestLine("/v2/services")
+    @RequestLine("GET /v2/services")
     Observable<Service> getServices();
 
-    @RequestLine("/v2/services/{guid}")
-    Observable<Service> getServices(@Param("guid") UUID guid);
+    @RequestLine("GET /v2/services/{service}")
+    Observable<Service> getServices(@Param("service") UUID service);
 }

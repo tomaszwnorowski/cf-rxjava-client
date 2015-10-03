@@ -1,5 +1,7 @@
 package queries;
 
+import java.util.Objects;
+
 public class Query {
 
     private final String filter;
@@ -7,9 +9,9 @@ public class Query {
     private final Object[] arguments;
 
     public Query(String filter, Operator operator, Object... arguments) {
-        this.filter = filter;
-        this.operator = operator;
-        this.arguments = arguments;
+        this.filter = Objects.requireNonNull(filter);
+        this.operator = Objects.requireNonNull(operator);
+        this.arguments = Objects.requireNonNull(arguments);
     }
 
     public static Query from(String filter, Operator operator, Object... arguments) {
