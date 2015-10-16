@@ -1,8 +1,6 @@
 package client;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import feign.FeignException;
 import feign.Response;
@@ -23,10 +21,8 @@ public class CfRxDecoder<T> implements Decoder {
     private final ObjectMapper mapper;
     private final Function<URI, Observable<T>> fetcher;
 
-    public CfRxDecoder(Function<URI, Observable<T>> fetcher) {
-        this.mapper = new ObjectMapper()
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .setPropertyNamingStrategy(new LowerCaseWithUnderscoresStrategy());
+    public CfRxDecoder(ObjectMapper mapper, Function<URI, Observable<T>> fetcher) {
+        this.mapper = mapper;
         this.fetcher = fetcher;
     }
 

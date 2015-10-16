@@ -7,14 +7,13 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.common.io.CharStreams;
 import feign.Response;
-import models.Organization;
 import models.Page;
+import models.application.Application;
+import models.organization.Organization;
+import models.service.ServiceInstance;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import queries.Operator;
-import queries.Query;
 import rx.observers.TestSubscriber;
 
 import java.io.IOException;
@@ -22,6 +21,8 @@ import java.io.InputStreamReader;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static queries.Operator.EQ;
+import static queries.Query.query;
 
 public class CfRxClientTest {
 
@@ -54,7 +55,7 @@ public class CfRxClientTest {
 
         // when
         final TestSubscriber<Organization> testSubscriber = new TestSubscriber<>();
-        client.getOrganization(UUID.fromString("e4e8c3fc-1c5b-4571-9517-36a3c6e0b837"))
+        client.getOrganizations(UUID.fromString("e4e8c3fc-1c5b-4571-9517-36a3c6e0b837"))
                 .subscribe(testSubscriber);
 
         // then
@@ -111,12 +112,12 @@ public class CfRxClientTest {
 
         // when
         final TestSubscriber<Organization> testSubscriber = new TestSubscriber<>();
-        client.getOrganizations(Query.from("name", Operator.EQ, "page-2-org"))
+        client.getOrganizations(query("name", EQ, "page-2-org"))
                 .subscribe(testSubscriber);
 
         // then
         testSubscriber.assertNoErrors();
-        testSubscriber.assertValues(page.getResources().get(0));
+        testSubscriber.assertReceivedOnNext(page.getResources());
     }
 
     @Test
@@ -128,11 +129,54 @@ public class CfRxClientTest {
 
         // when
         final TestSubscriber<Response> testSubscriber = new TestSubscriber<>();
-        client.deleteOrganization(UUID.fromString("e4e8c3fc-1c5b-4571-9517-36a3c6e0b837"))
+        client.deleteOrganization(UUID.fromString("e4e8c3fc-1c5b-4571-9517-36a3c6e0b837"), true, true)
                 .subscribe(testSubscriber);
 
         // then
         testSubscriber.assertNoErrors();
+    }
+
+    @Test
+    public void retrieveAllServiceInstancesTest() throws IOException {
+        // given
+        final String pageJson = loadJson("service_instances_page_1.json");
+        final Page<ServiceInstance> page = mapper.readValue(pageJson, new TypeReference<Page<ServiceInstance>>() {
+        });
+
+        stubFor(get(urlPathEqualTo("/v2/service_instances"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(pageJson)));
+
+        // when
+        final TestSubscriber<ServiceInstance> testSubscriber = new TestSubscriber<>();
+        client.getServiceInstances().subscribe(testSubscriber);
+
+        // then
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertReceivedOnNext(page.getResources());
+    }
+
+    @Test
+    public void retrieveApplicationsTest() throws IOException {
+        final String pageJson = loadJson("applications.json");
+        final Page<Application> page = mapper.readValue(pageJson, new TypeReference<Page<Application>>() {
+        });
+
+        stubFor(get(urlPathEqualTo("/v2/apps"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(pageJson)));
+
+        // when
+        final TestSubscriber<Application> testSubscriber = new TestSubscriber<>();
+        client.getApplications().subscribe(testSubscriber);
+
+        // then
+        testSubscriber.assertNoErrors();
+        testSubscriber.assertReceivedOnNext(page.getResources());
     }
 
     private String loadJson(String name) {

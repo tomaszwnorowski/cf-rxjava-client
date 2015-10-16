@@ -1,10 +1,25 @@
 package client;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import feign.*;
 import feign.Feign.Builder;
 import feign.codec.Decoder;
+import feign.codec.Encoder;
 import feign.jackson.JacksonEncoder;
 import models.*;
+import models.application.Application;
+import models.application.ApplicationSummary;
+import models.application.ApplicationUpdate;
+import models.organization.Organization;
+import models.organization.OrganizationSummary;
+import models.organization.OrganizationUser;
+import models.service.*;
+import models.space.*;
+import models.summary.SpaceSummary;
+import models.user.User;
 import operations.*;
 import queries.Query;
 import rx.Observable;
@@ -35,30 +50,38 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     public CfRxClient(String api, Function<Builder, Builder> customizations) {
-        applications = customizations.apply(defaults(new CfRxDecoder<>(this::getApplications)))
+        final ObjectMapper mapper = new ObjectMapper()
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());
+
+        final Encoder encoder = new JacksonEncoder(mapper);
+
+
+        applications = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getApplications), encoder))
                 .target(Applications.class, api);
 
-        organizations = customizations.apply(defaults(new CfRxDecoder<>(this::getOrganizations)))
+        organizations = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getOrganizations), encoder))
                 .target(Organizations.class, api);
 
-        spaces = customizations.apply(defaults(new CfRxDecoder<>(this::getSpaces)))
+        spaces = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getSpaces), encoder))
                 .target(Spaces.class, api);
 
-        services = customizations.apply(defaults(new CfRxDecoder<>(this::getServices)))
+        services = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getServices), encoder))
                 .target(Services.class, api);
 
-        serviceInstances = customizations.apply(defaults(new CfRxDecoder<>(this::getServiceInstances)))
+        serviceInstances = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getServiceInstances), encoder))
                 .target(ServiceInstances.class, api);
 
-        users = customizations.apply(defaults(new CfRxDecoder<>(this::getUsers)))
+        users = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getUsers), encoder))
                 .target(Users.class, api);
     }
 
-    private Builder defaults(Decoder decoder) {
+    private Builder defaults(Decoder decoder, Encoder encoder) {
         return Feign.builder()
-                .encoder(new JacksonEncoder())
                 .decoder(decoder)
-                .logger(new CfSlf4jLogger())
+                .encoder(encoder)
+                .logger(new CfSlf4jLogger(CfRxClient.class))
                 .logLevel(Logger.Level.FULL);
     }
 
@@ -71,6 +94,66 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return applications.getApplications(uri);
     }
 
+    @Override
+    public Observable<Application> addApplicationRoute(UUID app, UUID route) {
+        return applications.addApplicationRoute(app, route);
+    }
+
+    @Override
+    public Observable<Response> deleteApplication(UUID app) {
+        return applications.deleteApplication(app);
+    }
+
+    @Override
+    public Observable<ApplicationSummary> getApplicationSummary(UUID app) {
+        return applications.getApplicationSummary(app);
+    }
+
+    @Override
+    public Observable<Application> getApplications() {
+        return applications.getApplications();
+    }
+
+    @Override
+    public Observable<Application> getApplications(UUID app) {
+        return applications.getApplications(app);
+    }
+
+    @Override
+    public Observable<Application> getApplications(Query query) {
+        return applications.getApplications(query);
+    }
+
+    @Override
+    public Observable<Route> getApplicationRoutes(UUID app) {
+        return applications.getApplicationRoutes(app);
+    }
+
+    @Override
+    public Observable<ServiceBinding> getApplicationServiceBindings(UUID app) {
+        return applications.getApplicationServiceBindings(app);
+    }
+
+    @Override
+    public Observable<Application> removeApplicationRoute(UUID app, UUID route) {
+        return applications.removeApplicationRoute(app, route);
+    }
+
+    @Override
+    public Observable<Application> removeApplicationServiceBinding(UUID app, UUID serviceBinding) {
+        return applications.removeApplicationServiceBinding(app, serviceBinding);
+    }
+
+    @Override
+    public Observable<Application> restageApplication(UUID app) {
+        return applications.restageApplication(app);
+    }
+
+    @Override
+    public Observable<Application> updateApplication(UUID app, ApplicationUpdate update) {
+        return applications.updateApplication(app, update);
+    }
+
     /************************************************************************************************
      * ORGANIZATIONS
      ************************************************************************************************/
@@ -81,28 +164,103 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Organization> createOrganization(String name) {
-        return organizations.createOrganization(name);
-    }
-
-    @Override
-    public Observable<Organization> updateOrganization(UUID organization, String name) {
-        return organizations.updateOrganization(organization, name);
-    }
-
-    @Override
-    public Observable<Response> deleteOrganization(UUID organization) {
-        return organizations.deleteOrganization(organization);
-    }
-
-    @Override
     public Observable<Organization> addOrganizationAuditor(UUID organization, UUID user) {
         return organizations.addOrganizationAuditor(organization, user);
     }
 
     @Override
+    public Observable<Organization> addOrganizationAuditor(UUID organization, String username) {
+        return organizations.addOrganizationAuditor(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationBillingManager(UUID organization, UUID user) {
+        return organizations.addOrganizationBillingManager(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationBillingManager(UUID organization, String username) {
+        return organizations.addOrganizationBillingManager(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationManager(UUID organization, UUID user) {
+        return organizations.addOrganizationManager(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationManager(UUID organization, String username) {
+        return organizations.addOrganizationManager(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationPrivateDomain(UUID organization, UUID privateDomain) {
+        return organizations.addOrganizationPrivateDomain(organization, privateDomain);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationUser(UUID organization, UUID user) {
+        return organizations.addOrganizationUser(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> addOrganizationUser(UUID organization, String username) {
+        return organizations.addOrganizationUser(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> createOrganization(String name) {
+        return organizations.createOrganization(name);
+    }
+
+    @Override
+    public Observable<Response> deleteOrganization(UUID organization, boolean recursive, boolean async) {
+        return organizations.deleteOrganization(organization, recursive, async);
+    }
+
+    @Override
     public Observable<Organization> removeOrganizationAuditor(UUID organization, UUID user) {
         return organizations.removeOrganizationAuditor(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationAuditor(UUID organization, String username) {
+        return organizations.removeOrganizationAuditor(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationBillingManager(UUID organization, UUID user) {
+        return organizations.removeOrganizationBillingManager(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationBillingManager(UUID organization, String username) {
+        return organizations.removeOrganizationBillingManager(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationManager(UUID organization, UUID user) {
+        return organizations.removeOrganizationManager(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationManager(UUID organization, String username) {
+        return organizations.removeOrganizationManager(organization, username);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationUser(UUID organization, UUID user) {
+        return organizations.removeOrganizationUser(organization, user);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationUser(UUID organization, String username) {
+        return organizations.removeOrganizationUser(organization, username);
+    }
+
+    @Override
+    public Observable<OrganizationSummary> getOrganizationSummary(UUID organization) {
+        return organizations.getOrganizationSummary(organization);
     }
 
     @Override
@@ -116,16 +274,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Organization> addOrganizationBillingManager(UUID organization, UUID user) {
-        return organizations.addOrganizationBillingManager(organization, user);
-    }
-
-    @Override
-    public Observable<Organization> removeOrganizationBillingManager(UUID organization, UUID user) {
-        return organizations.removeOrganizationBillingManager(organization, user);
-    }
-
-    @Override
     public Observable<User> getOrganizationBillingManagers(UUID organization) {
         return organizations.getOrganizationBillingManagers(organization);
     }
@@ -133,16 +281,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     @Override
     public Observable<User> getOrganizationBillingManagers(UUID organization, Query query) {
         return organizations.getOrganizationBillingManagers(organization, query);
-    }
-
-    @Override
-    public Observable<Organization> addOrganizationManager(UUID organization, UUID user) {
-        return organizations.addOrganizationManager(organization, user);
-    }
-
-    @Override
-    public Observable<Organization> removeOrganizationManager(UUID organization, UUID user) {
-        return organizations.removeOrganizationManager(organization, user);
     }
 
     @Override
@@ -156,13 +294,18 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Organization> addOrganizationPrivateDomain(UUID organization, UUID privateDomain) {
-        return organizations.addOrganizationPrivateDomain(organization, privateDomain);
+    public Observable<Organization> getOrganizations() {
+        return organizations.getOrganizations();
     }
 
     @Override
-    public Observable<Organization> removeOrganizationPrivateDomain(UUID organization, UUID privateDomain) {
-        return organizations.removeOrganizationPrivateDomain(organization, privateDomain);
+    public Observable<Organization> getOrganizations(UUID organization) {
+        return organizations.getOrganizations(organization);
+    }
+
+    @Override
+    public Observable<Organization> getOrganizations(Query query) {
+        return organizations.getOrganizations(query);
     }
 
     @Override
@@ -176,13 +319,33 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Organization> addOrganizationUser(UUID organization, UUID user) {
-        return organizations.addOrganizationUser(organization, user);
+    public Observable<Service> getOrganizationServices(UUID organization) {
+        return organizations.getOrganizationServices(organization);
     }
 
     @Override
-    public Observable<Organization> removeOrganizationUser(UUID organization, UUID user) {
-        return organizations.removeOrganizationUser(organization, user);
+    public Observable<Service> getOrganizationServices(UUID organization, Query query) {
+        return organizations.getOrganizationServices(organization, query);
+    }
+
+    @Override
+    public Observable<SpaceQuotaDefinition> getOrganizationSpaceQuotaDefinitions(UUID organization) {
+        return organizations.getOrganizationSpaceQuotaDefinitions(organization);
+    }
+
+    @Override
+    public Observable<SpaceQuotaDefinition> getOrganizationSpaceQuotaDefinitions(UUID organization, Query query) {
+        return organizations.getOrganizationSpaceQuotaDefinitions(organization, query);
+    }
+
+    @Override
+    public Observable<Space> getOrganizationSpaces(UUID organization) {
+        return organizations.getOrganizationSpaces(organization);
+    }
+
+    @Override
+    public Observable<Space> getOrganizationSpaces(UUID organization, Query query) {
+        return organizations.getOrganizationSpaces(organization, query);
     }
 
     @Override
@@ -196,11 +359,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<OrganizationSummary> getOrganizationSummary(UUID organization) {
-        return organizations.getOrganizationSummary(organization);
-    }
-
-    @Override
     public Observable<InstanceUsage> getOrganizationInstanceUsage(UUID organization) {
         return organizations.getOrganizationInstanceUsage(organization);
     }
@@ -208,6 +366,16 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     @Override
     public Observable<MemoryUsage> getOrganizationMemoryUsage(UUID organization) {
         return organizations.getOrganizationMemoryUsage(organization);
+    }
+
+    @Override
+    public Observable<Organization> updateOrganization(UUID organization, String name) {
+        return organizations.updateOrganization(organization, name);
+    }
+
+    @Override
+    public Observable<Organization> removeOrganizationPrivateDomain(UUID organization, UUID privateDomain) {
+        return organizations.removeOrganizationPrivateDomain(organization, privateDomain);
     }
 
     @Override
@@ -220,36 +388,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return organizations.getOrganizationUserRoles(organization, query);
     }
 
-    @Override
-    public Observable<SpaceQuotaDefinition> getOrganizationSpaceQuotaDefinitions(UUID organization) {
-        return organizations.getOrganizationSpaceQuotaDefinitions(organization);
-    }
-
-    @Override
-    public Observable<Organization> getOrganizations() {
-        return organizations.getOrganizations();
-    }
-
-    @Override
-    public Observable<Organization> getOrganizations(Query query) {
-        return organizations.getOrganizations(query);
-    }
-
-    @Override
-    public Observable<Organization> getOrganization(UUID organization) {
-        return organizations.getOrganization(organization);
-    }
-
-    @Override
-    public Observable<Space> getOrganizationSpaces(UUID organization) {
-        return organizations.getOrganizationSpaces(organization);
-    }
-
-    @Override
-    public Observable<Service> getOrganizationServices(UUID organization) {
-        return organizations.getOrganizationServices(organization);
-    }
-
     /************************************************************************************************
      * SPACES
      ************************************************************************************************/
@@ -260,28 +398,93 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Space> createSpace(String name, UUID organization) {
-        return spaces.createSpace(name, organization);
-    }
-
-    @Override
-    public Observable<Space> updateSpace(UUID space, String name) {
-        return spaces.updateSpace(space, name);
-    }
-
-    @Override
-    public Observable<Response> deleteSpace(UUID space) {
-        return spaces.deleteSpace(space);
-    }
-
-    @Override
     public Observable<Space> addSpaceAuditor(UUID space, UUID user) {
         return spaces.addSpaceAuditor(space, user);
     }
 
     @Override
+    public Observable<Space> addSpaceAuditor(UUID space, String username) {
+        return spaces.addSpaceAuditor(space, username);
+    }
+
+    @Override
+    public Observable<Space> addSpaceDeveloper(UUID space, UUID user) {
+        return spaces.addSpaceDeveloper(space, user);
+    }
+
+    @Override
+    public Observable<Space> addSpaceDeveloper(UUID space, String username) {
+        return spaces.addSpaceDeveloper(space, username);
+    }
+
+    @Override
+    public Observable<Space> addSpaceManager(UUID space, UUID user) {
+        return spaces.addSpaceManager(space, user);
+    }
+
+    @Override
+    public Observable<Space> addSpaceManager(UUID space, String username) {
+        return spaces.addSpaceManager(space, username);
+    }
+
+    @Override
+    public Observable<Space> addSpaceSecurityGroup(UUID space, UUID securityGroup) {
+        return spaces.addSpaceSecurityGroup(space, securityGroup);
+    }
+
+    @Override
+    public Observable<Space> createSpace(SpaceCreate create) {
+        return spaces.createSpace(create);
+    }
+
+    @Override
+    public Observable<Response> deleteSpace(UUID space, boolean recursive, boolean async) {
+        return spaces.deleteSpace(space, recursive, async);
+    }
+
+    @Override
     public Observable<Space> removeSpaceAuditor(UUID space, UUID user) {
         return spaces.removeSpaceAuditor(space, user);
+    }
+
+    @Override
+    public Observable<Space> removeSpaceAuditor(UUID space, String username) {
+        return spaces.removeSpaceAuditor(space, username);
+    }
+
+    @Override
+    public Observable<Space> removeSpaceDeveloper(UUID space, UUID user) {
+        return spaces.removeSpaceDeveloper(space, user);
+    }
+
+    @Override
+    public Observable<Space> removeSpaceDeveloper(UUID space, String username) {
+        return spaces.removeSpaceDeveloper(space, username);
+    }
+
+    @Override
+    public Observable<Space> removeSpaceManager(UUID space, UUID user) {
+        return spaces.removeSpaceManager(space, user);
+    }
+
+    @Override
+    public Observable<Space> removeSpaceManager(UUID space, String username) {
+        return spaces.removeSpaceManager(space, username);
+    }
+
+    @Override
+    public Observable<SpaceSummary> getSpaceSummary(UUID space) {
+        return spaces.getSpaceSummary(space);
+    }
+
+    @Override
+    public Observable<Application> getSpaceApplications(UUID space) {
+        return spaces.getSpaceApplications(space);
+    }
+
+    @Override
+    public Observable<Application> getSpaceApplications(UUID space, Query query) {
+        return spaces.getSpaceApplications(space, query);
     }
 
     @Override
@@ -295,16 +498,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Space> addSpaceDeveloper(UUID space, UUID user) {
-        return spaces.addSpaceDeveloper(space, user);
-    }
-
-    @Override
-    public Observable<Space> removeSpaceDeveloper(UUID space, UUID user) {
-        return spaces.removeSpaceDeveloper(space, user);
-    }
-
-    @Override
     public Observable<User> getSpaceDevelopers(UUID space) {
         return spaces.getSpaceDevelopers(space);
     }
@@ -312,16 +505,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     @Override
     public Observable<User> getSpaceDevelopers(UUID space, Query query) {
         return spaces.getSpaceDevelopers(space, query);
-    }
-
-    @Override
-    public Observable<Space> addSpaceManager(UUID space, UUID user) {
-        return spaces.addSpaceManager(space, user);
-    }
-
-    @Override
-    public Observable<Space> removeSpaceManager(UUID space, UUID user) {
-        return spaces.removeSpaceManager(space, user);
     }
 
     @Override
@@ -345,16 +528,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Space> addSpaceSecurityGroup(UUID space, UUID securityGroup) {
-        return spaces.addSpaceSecurityGroup(space, securityGroup);
-    }
-
-    @Override
-    public Observable<Space> removeSpaceSecurityGroup(UUID space, UUID securityGroup) {
-        return spaces.removeSpaceSecurityGroup(space, securityGroup);
-    }
-
-    @Override
     public Observable<SecurityGroup> getSpaceSecurityGroups(UUID space) {
         return spaces.getSpaceSecurityGroups(space);
     }
@@ -365,13 +538,13 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Application> getSpaceApplications(UUID space) {
-        return spaces.getSpaceApplications(space);
+    public Observable<ServiceInstance> getSpaceServiceInstances(UUID space) {
+        return spaces.getSpaceServiceInstances(space);
     }
 
     @Override
-    public Observable<Application> getSpaceApplications(UUID space, Query query) {
-        return spaces.getSpaceApplications(space, query);
+    public Observable<ServiceInstance> getSpaceServiceInstances(UUID space, Query query) {
+        return spaces.getSpaceServiceInstances(space, query);
     }
 
     @Override
@@ -385,18 +558,13 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Service> getSpaceServiceInstances(UUID space) {
-        return spaces.getSpaceServiceInstances(space);
-    }
-
-    @Override
-    public Observable<Service> getSpaceServiceInstances(UUID space, Query query) {
-        return spaces.getSpaceServiceInstances(space, query);
-    }
-
-    @Override
     public Observable<Space> getSpaces() {
         return spaces.getSpaces();
+    }
+
+    @Override
+    public Observable<Space> getSpaces(UUID space) {
+        return spaces.getSpaces(space);
     }
 
     @Override
@@ -405,8 +573,18 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<Space> getSpaces(UUID space) {
-        return spaces.getSpaces(space);
+    public Observable<Space> removeSpaceSecurityGroup(UUID space, UUID securityGroup) {
+        return spaces.removeSpaceSecurityGroup(space, securityGroup);
+    }
+
+    @Override
+    public Observable<SpaceUser> getSpaceUserRoles(UUID space) {
+        return spaces.getSpaceUserRoles(space);
+    }
+
+    @Override
+    public Observable<Space> updateSpace(UUID space, SpaceUpdate update) {
+        return spaces.updateSpace(space, update);
     }
 
     /************************************************************************************************
@@ -416,21 +594,6 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     @Override
     public Observable<Service> getServices(URI uri) {
         return services.getServices(uri);
-    }
-
-    @Override
-    public Observable<Service> getServices() {
-        return services.getServices();
-    }
-
-    @Override
-    public Observable<Service> getServices(UUID guid) {
-        return services.getServices(guid);
-    }
-
-    @Override
-    public Observable<Service> getServices(Query query) {
-        return services.getServices(query);
     }
 
     @Override
@@ -448,6 +611,21 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return services.getServicePlans(service, query);
     }
 
+    @Override
+    public Observable<Service> getServices() {
+        return services.getServices();
+    }
+
+    @Override
+    public Observable<Service> getServices(UUID service) {
+        return services.getServices(service);
+    }
+
+    @Override
+    public Observable<Service> getServices(Query query) {
+        return services.getServices(query);
+    }
+
     /************************************************************************************************
      * SERVICE INSTANCES
      ************************************************************************************************/
@@ -458,33 +636,8 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<ServiceInstance> getServiceInstances() {
-        return serviceInstances.getServiceInstances();
-    }
-
-    @Override
-    public Observable<ServiceInstance> getServiceInstances(Query query) {
-        return serviceInstances.getServiceInstances(query);
-    }
-
-    @Override
-    public Observable<ServiceInstance> createServiceInstance(String name, UUID servicePlan, UUID space) {
-        return serviceInstances.createServiceInstance(name, servicePlan, space);
-    }
-
-    @Override
-    public Observable<ServiceInstance> createServiceInstance(String name, UUID servicePlan, UUID space, Object parameters) {
-        return serviceInstances.createServiceInstance(name, servicePlan, space, parameters);
-    }
-
-    @Override
-    public Observable<ServiceInstance> updateServiceInstance(UUID serviceInstance, String name, UUID servicePlan) {
-        return serviceInstances.updateServiceInstance(serviceInstance, name, servicePlan);
-    }
-
-    @Override
-    public Observable<ServiceInstance> updateServiceInstance(UUID serviceInstance, String name, UUID servicePlan, Object parameters) {
-        return serviceInstances.updateServiceInstance(serviceInstance, name, servicePlan, parameters);
+    public Observable<ServiceInstance> createServiceInstance(ServiceInstanceCreate create) {
+        return serviceInstances.createServiceInstance(create);
     }
 
     @Override
@@ -502,6 +655,26 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return serviceInstances.getServiceInstanceBindings(serviceInstance);
     }
 
+    @Override
+    public Observable<ServiceInstance> getServiceInstances() {
+        return serviceInstances.getServiceInstances();
+    }
+
+    @Override
+    public Observable<ServiceInstance> getServiceInstances(UUID serviceInstance) {
+        return serviceInstances.getServiceInstances(serviceInstance);
+    }
+
+    @Override
+    public Observable<ServiceInstance> getServiceInstances(Query query) {
+        return serviceInstances.getServiceInstances(query);
+    }
+
+    @Override
+    public Observable<ServiceInstance> updateServiceInstance(UUID serviceInstance, ServiceInstanceUpdate update) {
+        return serviceInstances.updateServiceInstance(serviceInstance, update);
+    }
+
     /************************************************************************************************
      * USERS
      ************************************************************************************************/
@@ -517,28 +690,8 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<User> removeAuditedOrganization(UUID user, UUID organization) {
-        return users.removeAuditedOrganization(user, organization);
-    }
-
-    @Override
-    public Observable<Organization> getAuditedOrganizations(UUID user) {
-        return users.getAuditedOrganizations(user);
-    }
-
-    @Override
     public Observable<User> addAuditedSpace(UUID user, UUID space) {
         return users.addAuditedSpace(user, space);
-    }
-
-    @Override
-    public Observable<User> removeAuditedSpace(UUID user, UUID space) {
-        return users.removeAuditedSpace(user, space);
-    }
-
-    @Override
-    public Observable<Space> getAuditedSpaces(UUID user) {
-        return users.getAuditedSpaces(user);
     }
 
     @Override
@@ -547,12 +700,67 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     }
 
     @Override
-    public Observable<User> removeBillingManagedOrganization(UUID user, UUID organization) {
-        return users.removeBillingManagedOrganization(user, organization);
+    public Observable<User> addManagedOrganization(UUID user, UUID organization) {
+        return users.addManagedOrganization(user, organization);
+    }
+
+    @Override
+    public Observable<User> addManagedSpace(UUID user, UUID space) {
+        return users.addManagedSpace(user, space);
+    }
+
+    @Override
+    public Observable<User> addOrganization(UUID user, UUID organization) {
+        return users.addOrganization(user, organization);
+    }
+
+    @Override
+    public Observable<User> addSpace(UUID user, UUID space) {
+        return users.addSpace(user, space);
+    }
+
+    @Override
+    public Observable<Organization> getAuditedOrganizations(UUID user) {
+        return users.getAuditedOrganizations(user);
     }
 
     @Override
     public Observable<Organization> getBillingManagedOrganizations(UUID user) {
         return users.getBillingManagedOrganizations(user);
+    }
+
+    @Override
+    public Observable<Space> getAuditedSpaces(UUID user) {
+        return users.getAuditedSpaces(user);
+    }
+
+    @Override
+    public Observable<User> getUsers() {
+        return users.getUsers();
+    }
+
+    @Override
+    public Observable<User> getUsers(UUID user) {
+        return users.getUsers(user);
+    }
+
+    @Override
+    public Observable<User> getUsers(Query query) {
+        return users.getUsers(query);
+    }
+
+    @Override
+    public Observable<User> removeAuditedOrganization(UUID user, UUID organization) {
+        return users.removeAuditedOrganization(user, organization);
+    }
+
+    @Override
+    public Observable<User> removeAuditedSpace(UUID user, UUID space) {
+        return users.removeAuditedSpace(user, space);
+    }
+
+    @Override
+    public Observable<User> removeBillingManagedOrganization(UUID user, UUID organization) {
+        return users.removeBillingManagedOrganization(user, organization);
     }
 }

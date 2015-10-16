@@ -1,0 +1,49 @@
+{
+  "total_results": 1,
+  "total_pages": 1,
+  "prev_url": null,
+  "next_url": null,
+  "resources": [
+    {
+      "metadata": {
+        "guid": "d90e6aea-ad1e-4ac3-8d62-6fe112319338",
+        "url": "/v2/service_instances/d90e6aea-ad1e-4ac3-8d62-6fe112319338",
+        "created_at": "2015-09-30T23:31:00Z",
+        "updated_at": null
+      },
+      "entity": {
+        "name": "name-2236",
+        "credentials": {
+          "name": "ad_c6f4446532610ab",
+          "hostname": "us-cdbr-east-03.cleardb.com",
+          "port": "3306",
+          "username": "b5d435f40dd2b2",
+          "password": "ebfc00ac",
+          "uri": "mysql://b5d435f40dd2b2:ebfc00ac@us-cdbr-east-03.cleardb.com:3306/ad_c6f4446532610ab",
+          "jdbcUrl": "jdbc:mysql://b5d435f40dd2b2:ebfc00ac@us-cdbr-east-03.cleardb.com:3306/ad_c6f4446532610ab"
+        },
+        "service_plan_guid": "916622e1-fdfb-4b19-ba98-25677bb7e9e0",
+        "space_guid": "7a6f5fbd-5de2-4ed0-9d16-361a214b1cef",
+        "gateway_data": null,
+        "dashboard_url": null,
+        "type": "managed_service_instance",
+        "last_operation": {
+          "type": "create",
+          "state": "succeeded",
+          "description": "service broker-provided description",
+          "updated_at": "2015-09-30T23:31:00Z",
+          "created_at": "2015-09-30T23:31:00Z"
+        },
+        "tags": [
+          "accounting",
+          "mongodb"
+        ],
+        "space_url": "/v2/spaces/7a6f5fbd-5de2-4ed0-9d16-361a214b1cef",
+        "service_plan_url": "/v2/service_plans/916622e1-fdfb-4b19-ba98-25677bb7e9e0",
+        "service_bindings_url": "/v2/service_instances/d90e6aea-ad1e-4ac3-8d62-6fe112319338/service_bindings",
+        "service_keys_url": "/v2/service_instances/d90e6aea-ad1e-4ac3-8d62-6fe112319338/service_keys",
+        "routes_url": "/v2/service_instances/d90e6aea-ad1e-4ac3-8d62-6fe112319338/routes"
+      }
+    }
+  ]
+}

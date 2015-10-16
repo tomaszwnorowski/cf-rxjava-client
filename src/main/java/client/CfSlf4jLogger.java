@@ -9,6 +9,10 @@ public class CfSlf4jLogger extends Slf4jLogger {
         super(CfSlf4jLogger.class);
     }
 
+    public CfSlf4jLogger(Class<?> clazz) {
+        super(clazz);
+    }
+
     @Override
     protected void log(String configKey, String format, Object... args) {
         if ((args != null) && (args.length == 2)) {
