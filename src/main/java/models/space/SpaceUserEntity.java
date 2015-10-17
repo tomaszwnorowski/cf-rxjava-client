@@ -13,7 +13,7 @@ public class SpaceUserEntity {
     protected boolean active;
     protected UUID defaultSpaceGuid;
     protected String username;
-    protected Set<String> spaceRoles;
+    protected Set<SpaceRole> spaceRoles;
     protected URI spacesUrl;
     protected URI organizationsUrl;
     protected URI managedOrganizationsUrl;

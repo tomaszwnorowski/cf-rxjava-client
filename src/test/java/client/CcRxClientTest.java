@@ -14,6 +14,7 @@ import models.service.ServiceInstance;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import queries.Query;
 import rx.observers.TestSubscriber;
 
 import java.io.IOException;
@@ -22,20 +23,20 @@ import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static queries.Operator.EQ;
-import static queries.Query.query;
+import static queries.Query.of;
 
-public class CfRxClientTest {
+public class CcRxClientTest {
 
     @ClassRule
     public static WireMockRule wireMockRule = new WireMockRule();
 
-    public CfRxClient client;
+    public CcRxClient client;
 
     public ObjectMapper mapper;
 
     @Before
     public void initialize() {
-        client = new CfRxClient("http://localhost:" + wireMockRule.port());
+        client = new CcRxClient("http://localhost:" + wireMockRule.port());
         mapper = new ObjectMapper()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy());
@@ -80,7 +81,7 @@ public class CfRxClientTest {
                         .withHeader("Content-Type", "application/json")
                         .withBody(page1Json)));
 
-        stubFor(get(urlPathEqualTo("/v2/organizations?page=2"))
+        stubFor(get(urlPathEqualTo("/v2/organizations?page=2&results-per-page=2"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
@@ -112,7 +113,7 @@ public class CfRxClientTest {
 
         // when
         final TestSubscriber<Organization> testSubscriber = new TestSubscriber<>();
-        client.getOrganizations(query("name", EQ, "page-2-org"))
+        client.getOrganizations(of("name", "page-2-org"))
                 .subscribe(testSubscriber);
 
         // then

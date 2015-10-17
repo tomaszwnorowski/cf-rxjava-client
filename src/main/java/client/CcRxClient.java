@@ -22,6 +22,8 @@ import models.summary.SpaceSummary;
 import models.user.User;
 import operations.*;
 import queries.Query;
+import queries.V2QueryExpander;
+import queries.V3QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -29,7 +31,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class CfRxClient implements Applications, Organizations, Spaces, Services, ServiceInstances, Users {
+public class CcRxClient implements Applications, Organizations, Spaces, Services, ServiceInstances, Users {
     private final Applications applications;
     private final Organizations organizations;
     private final Spaces spaces;
@@ -37,19 +39,19 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
     private final ServiceInstances serviceInstances;
     private final Users users;
 
-    public CfRxClient(CfConfig config) {
+    public CcRxClient(CcConfig config) {
         this(config.getTarget(), new OAuth2RequestInterceptor(config.getAccessToken()));
     }
 
-    public CfRxClient(String api) {
+    public CcRxClient(String api) {
         this(api, Function.identity());
     }
 
-    public CfRxClient(String api, RequestInterceptor... interceptors) {
+    public CcRxClient(String api, RequestInterceptor... interceptors) {
         this(api, builder -> builder.requestInterceptors(Arrays.asList(interceptors)));
     }
 
-    public CfRxClient(String api, Function<Builder, Builder> customizations) {
+    public CcRxClient(String api, Function<Builder, Builder> customizations) {
         final ObjectMapper mapper = new ObjectMapper()
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -58,22 +60,22 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         final Encoder encoder = new JacksonEncoder(mapper);
 
 
-        applications = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getApplications), encoder))
+        applications = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getApplications), encoder))
                 .target(Applications.class, api);
 
-        organizations = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getOrganizations), encoder))
+        organizations = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getOrganizations), encoder))
                 .target(Organizations.class, api);
 
-        spaces = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getSpaces), encoder))
+        spaces = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getSpaces), encoder))
                 .target(Spaces.class, api);
 
-        services = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getServices), encoder))
+        services = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getServices), encoder))
                 .target(Services.class, api);
 
-        serviceInstances = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getServiceInstances), encoder))
+        serviceInstances = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getServiceInstances), encoder))
                 .target(ServiceInstances.class, api);
 
-        users = customizations.apply(defaults(new CfRxDecoder<>(mapper, this::getUsers), encoder))
+        users = customizations.apply(defaults(new CcRxDecoder<>(mapper, this::getUsers), encoder))
                 .target(Users.class, api);
     }
 
@@ -81,7 +83,7 @@ public class CfRxClient implements Applications, Organizations, Spaces, Services
         return Feign.builder()
                 .decoder(decoder)
                 .encoder(encoder)
-                .logger(new CfSlf4jLogger(CfRxClient.class))
+                .logger(new CcSlf4jLogger(CcRxClient.class))
                 .logLevel(Logger.Level.FULL);
     }
 

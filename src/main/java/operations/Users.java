@@ -7,7 +7,7 @@ import models.organization.Organization;
 import models.space.Space;
 import models.user.User;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -86,7 +86,7 @@ public interface Users {
 
     @RequestLine("GET /v2/users?q={q}")
     Observable<User> getUsers(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("DELETE /v2/users/{user}/audited_organizations/{organization}")

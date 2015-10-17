@@ -1,6 +1,7 @@
 package evaluators;
 
 import com.google.common.io.CharStreams;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -13,11 +14,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JsonPathTest {
 
+    private JsonPathEvaluator evaluator;
+
+    @Before
+    public void initialize() {
+        evaluator = new JsonPathEvaluator(loadJson("vcap_services.json"));
+    }
+
     @Test
     public void readExistingScalarTest() {
-        // given
-        JsonPathEvaluator evaluator = new JsonPathEvaluator(loadJson("vcap_services.json"));
-
         // when
         Optional<Integer> port = evaluator.scalar(
                 filter("cloudamqp"),
@@ -31,9 +36,6 @@ public class JsonPathTest {
 
     @Test
     public void readNonExistentScalarTest() {
-        // given
-        JsonPathEvaluator evaluator = new JsonPathEvaluator(loadJson("vcap_services.json"));
-
         // when
         Optional<Integer> port = evaluator.scalar(
                 filter("cloudamqp"),
@@ -43,6 +45,18 @@ public class JsonPathTest {
 
         // then
         assertThat(port.isPresent(), is(false));
+    }
+
+    @Test
+    public void existentUserProvidedScalarTest() {
+        // when
+        Optional<String> username = evaluator.scalar(
+                filter("name", "sub"),
+                filter("username")
+        );
+
+        // then
+        assertThat(username.get(), is("usersub"));
     }
 
     private String loadJson(String name) {

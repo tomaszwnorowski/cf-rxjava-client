@@ -12,7 +12,7 @@ import models.space.SpaceUser;
 import models.summary.SpaceSummary;
 import models.user.User;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -133,7 +133,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/apps?q={q}")
     Observable<Application> getSpaceApplications(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/auditors")
@@ -144,7 +144,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/auditors?q={q}")
     Observable<User> getSpaceAuditors(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/developers")
@@ -155,7 +155,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/developers?q={q}")
     Observable<User> getSpaceDevelopers(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/managers")
@@ -166,7 +166,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/managers?q={q}")
     Observable<User> getSpaceManagers(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/routes")
@@ -177,7 +177,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/routes?q={q}")
     Observable<Route> getSpaceRoutes(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/security_groups")
@@ -188,7 +188,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/security_groups?q={q}")
     Observable<SecurityGroup> getSpaceSecurityGroups(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/service_instances")
@@ -199,7 +199,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/service_instances?q={q}")
     Observable<ServiceInstance> getSpaceServiceInstances(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces/{space}/services")
@@ -210,7 +210,7 @@ public interface Spaces {
     @RequestLine("GET /v2/spaces/{space}/services?q={q}")
     Observable<Service> getSpaceServices(
             @Param("space") UUID space,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/spaces")
@@ -223,7 +223,7 @@ public interface Spaces {
 
     @RequestLine("GET /v2/spaces?q={q}")
     Observable<Space> getSpaces(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("DELETE /v2/spaces/{space}/security_groups/{security_group}")

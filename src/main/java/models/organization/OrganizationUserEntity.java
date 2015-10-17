@@ -13,7 +13,7 @@ public class OrganizationUserEntity {
     protected boolean active;
     protected UUID defaultSpaceGuid;
     protected String username;
-    protected Set<String> organizationRoles;
+    protected Set<OrganizationRole> organizationRoles;
     protected URI spacesUrl;
     protected URI organizationsUrl;
     protected URI managedOrganizationsUrl;

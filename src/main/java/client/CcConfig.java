@@ -8,17 +8,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-public class CfConfig {
+public class CcConfig {
     private static final String CF_HOME = "CF_HOME";
     private static final String TARGET = "Target";
     private static final String ACCESS_TOKEN = "AccessToken";
     private final Map<String, Object> properties;
 
-    public CfConfig() {
+    public CcConfig() {
         this(Paths.get(System.getProperty(CF_HOME, System.getenv(CF_HOME)), ".cf", "config.json"));
     }
 
-    public CfConfig(Path configPath) {
+    public CcConfig(Path configPath) {
         try {
             this.properties = new ObjectMapper()
                     .readValue(configPath.toFile(), new TypeReference<Map<String, Object>>(){});

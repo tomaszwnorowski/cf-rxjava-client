@@ -14,8 +14,12 @@ public class Query {
         this.arguments = Objects.requireNonNull(arguments);
     }
 
-    public static Query query(String filter, Operator operator, Object... arguments) {
-        return new Query(filter, operator, arguments);
+    public static Query of(String filter, Object... arguments) {
+        if(arguments.length == 1) {
+            return new Query(filter, Operator.EQ, arguments);
+        } else {
+            return new Query(filter, Operator.IN, arguments);
+        }
     }
 
     public String getFilter() {
@@ -43,10 +47,5 @@ public class Query {
     @Override
     public int hashCode() {
         return Objects.hash(filter, operator, arguments);
-    }
-
-    @Override
-    public String toString() {
-        return operator.format(filter, arguments);
     }
 }

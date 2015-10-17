@@ -1,18 +1,13 @@
 package models.service;
 
-import evaluators.JsonPathEvaluator;
-import evaluators.JsonPathExpression;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
-import lombok.ToString;
 import models.LastOperation;
 
 import java.net.URI;
-import java.util.*;
+import java.util.Set;
+import java.util.UUID;
 
 @Data
-@ToString(exclude = "evaluator")
 public class ServiceInstanceEntity {
 
     protected String name;
@@ -29,18 +24,4 @@ public class ServiceInstanceEntity {
     protected URI serviceKeysUrl;
     protected URI routesUrl;
 
-    @Getter(value = AccessLevel.PRIVATE, lazy = true)
-    private transient final JsonPathEvaluator evaluator = initialize();
-
-    private JsonPathEvaluator initialize() {
-        return new JsonPathEvaluator(credentials);
-    }
-
-    public <T> Optional<T> findCredentialsScalar(JsonPathExpression... expressions) {
-        return getEvaluator().scalar(expressions);
-    }
-
-    public <T> List<T> findCredentialsList(JsonPathExpression... expressions) {
-        return getEvaluator().list(expressions);
-    }
 }

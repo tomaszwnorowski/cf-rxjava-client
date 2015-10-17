@@ -2,14 +2,14 @@ package client;
 
 import feign.slf4j.Slf4jLogger;
 
-public class CfSlf4jLogger extends Slf4jLogger {
+public class CcSlf4jLogger extends Slf4jLogger {
     private static final String PRIVATE_DATA = "[PRIVATE DATA HIDDEN]";
 
-    public CfSlf4jLogger() {
-        super(CfSlf4jLogger.class);
+    public CcSlf4jLogger() {
+        super(CcSlf4jLogger.class);
     }
 
-    public CfSlf4jLogger(Class<?> clazz) {
+    public CcSlf4jLogger(Class<?> clazz) {
         super(clazz);
     }
 

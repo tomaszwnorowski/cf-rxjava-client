@@ -45,5 +45,33 @@
         "password": "1M5zd3QfWi9nUyya"
       }
     }
+  ],
+  "user-provided": [
+    {
+      "name": "pubsub",
+      "label": "user-provided",
+      "tags": [],
+      "credentials": {
+        "binary": "pubsub.rb",
+        "host": "pubsub01.example.com",
+        "password": "p@29w0rd",
+        "port": "1234",
+        "username": "pubsubuser"
+      },
+      "syslog_drain_url": ""
+    },
+    {
+      "name": "sub",
+      "label": "user-provided",
+      "tags": [],
+      "credentials": {
+        "binary": "sub",
+        "host": "sub.test.pl",
+        "password": "apas",
+        "port": "4342",
+        "username": "usersub"
+      },
+      "syslog_drain_url": ""
+    }
   ]
 }

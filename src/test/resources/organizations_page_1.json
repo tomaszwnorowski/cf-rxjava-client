@@ -2,7 +2,7 @@
   "total_results": 1,
   "total_pages": 1,
   "prev_url": null,
-  "next_url": "/v2/organizations?page=2",
+  "next_url": "/v2/organizations?page=2&results-per-page=2",
   "resources": [
     {
       "metadata": {

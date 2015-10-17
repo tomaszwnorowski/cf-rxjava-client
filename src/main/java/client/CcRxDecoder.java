@@ -16,12 +16,12 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.function.Function;
 
-public class CfRxDecoder<T> implements Decoder {
+public class CcRxDecoder<T> implements Decoder {
     private static final int BUFFER_SIZE = 32;
     private final ObjectMapper mapper;
     private final Function<URI, Observable<T>> fetcher;
 
-    public CfRxDecoder(ObjectMapper mapper, Function<URI, Observable<T>> fetcher) {
+    public CcRxDecoder(ObjectMapper mapper, Function<URI, Observable<T>> fetcher) {
         this.mapper = mapper;
         this.fetcher = fetcher;
     }

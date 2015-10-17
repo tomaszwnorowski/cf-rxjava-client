@@ -10,7 +10,7 @@ import models.space.Space;
 import models.space.SpaceQuotaDefinition;
 import models.user.User;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -158,7 +158,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/auditors?q={q}")
     Observable<User> getOrganizationAuditors(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/billing_managers")
@@ -169,7 +169,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/billing_managers?q={q}")
     Observable<User> getOrganizationBillingManagers(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/managers")
@@ -180,7 +180,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/managers?q={q}")
     Observable<User> getOrganizationManagers(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations")
@@ -193,7 +193,7 @@ public interface Organizations {
 
     @RequestLine("GET /v2/organizations?q={q}")
     Observable<Organization> getOrganizations(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/private_domains")
@@ -204,7 +204,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/private_domains?q={q}")
     Observable<PrivateDomain> getOrganizationPrivateDomains(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/services")
@@ -215,7 +215,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/services?q={q}")
     Observable<Service> getOrganizationServices(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/space_quota_definitions")
@@ -226,7 +226,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/space_quota_definitions?q={q}")
     Observable<SpaceQuotaDefinition> getOrganizationSpaceQuotaDefinitions(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/spaces")
@@ -237,7 +237,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/spaces?q={q}")
     Observable<Space> getOrganizationSpaces(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/users")
@@ -248,7 +248,7 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/users?q={q}")
     Observable<User> getOrganizationUsers(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/organizations/{organization}/instance_usage")
@@ -282,6 +282,6 @@ public interface Organizations {
     @RequestLine("GET /v2/organizations/{organization}/user_roles?q={q}")
     Observable<OrganizationUser> getOrganizationUserRoles(
             @Param("organization") UUID organization,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 }

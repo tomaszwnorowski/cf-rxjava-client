@@ -9,7 +9,7 @@ import models.service.ServiceInstance;
 import models.service.ServiceInstanceCreate;
 import models.service.ServiceInstanceUpdate;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -51,7 +51,7 @@ public interface ServiceInstances {
 
     @RequestLine("GET /v2/service_instances?q={q}")
     Observable<ServiceInstance> getServiceInstances(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("PUT /v2/service_instances/{service_instance}")

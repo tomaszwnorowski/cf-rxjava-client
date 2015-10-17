@@ -4,13 +4,13 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import feign.Response;
+import models.Route;
 import models.application.Application;
 import models.application.ApplicationSummary;
-import models.Route;
 import models.application.ApplicationUpdate;
 import models.service.ServiceBinding;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -48,7 +48,7 @@ public interface Applications {
 
     @RequestLine("GET /v2/apps?q={q}")
     Observable<Application> getApplications(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/apps/{app}/route")

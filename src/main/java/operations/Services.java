@@ -4,7 +4,7 @@ import feign.*;
 import models.service.Service;
 import models.service.ServicePlan;
 import queries.Query;
-import queries.QueryExpander;
+import queries.V2QueryExpander;
 import rx.Observable;
 
 import java.net.URI;
@@ -29,7 +29,7 @@ public interface Services {
     @RequestLine("GET /v2/services/{service}/service_plans?q={q}")
     Observable<ServicePlan> getServicePlans(
             @Param("service") UUID service,
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
     @RequestLine("GET /v2/services")
@@ -42,7 +42,7 @@ public interface Services {
 
     @RequestLine("GET /v2/services?q={q}")
     Observable<Service> getServices(
-            @Param(value = "q", expander = QueryExpander.class) Query query
+            @Param(value = "q", expander = V2QueryExpander.class) Query query
     );
 
 }
